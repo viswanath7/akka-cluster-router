@@ -1,6 +1,6 @@
 package com.example.akka.actor
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.cluster.Cluster
 import akka.routing.FromConfig
 import com.typesafe.config.Config
@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration._
 import scala.util.Random
 
-class FrontEnd extends Actor {
+class FrontEnd extends Actor with ActorLogging{
 
   private val logger = LoggerFactory getLogger FrontEnd.getClass
 
-  val backend = context.actorOf(FromConfig.props(), name = "backendRouter")
+  val backendRouter = context.actorOf(FromConfig.props(), name = "backendRouter")
   import context.dispatcher
   context.system.scheduler.schedule(1 seconds, 1 seconds, self, createRequestMessage)
 
@@ -23,7 +23,7 @@ class FrontEnd extends Actor {
 
   def receive = {
     case quote:Quote => logger info s"FrontEnd received the message $quote so forwarding it to BackEnd"
-      backend forward quote
+      backendRouter forward quote
     case _ => logger warn "Discarding unsupported message"
   }
 
