@@ -44,6 +44,10 @@ object FrontEnd {
     var actorRef:ActorRef = null
     val actorSystem = ActorSystem(nameOfActorSystem, baseConfiguration)
     logger info s"Registering a front-end for cluster of actor system ${actorSystem.name}"
+    /*
+     * FrontEnd actor is started in 'registerOnMemberUp' call back method which is invoked
+     * when the current member's status is changed to 'UP' by the leader.
+     */
     Cluster(actorSystem) registerOnMemberUp {
       actorRef = actorSystem.actorOf(props, name = "frontend")
     }
